@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "antd";
-import { fetchLogs, database } from "../../services/firebase";
+import { Table, Select } from "antd";
+import { fetchLogs } from "../../services/firebase";
+
+const { Option } = Select;
 
 const HomeScreen = () => {
   const [logs, setLogs] = useState([]);
+  const [order, setOrder] = useState("desc");
+  const [sortedLogs, setSortedLogs] = useState([]);
 
   useEffect(() => {
     const loadLogs = async () => {
@@ -20,7 +24,24 @@ const HomeScreen = () => {
     loadLogs();
   }, []);
 
-  // Define las columnas para la tabla de Ant Design
+  useEffect(() => {
+    sortLogs();
+  }, [order, logs]);
+
+  const sortLogs = () => {
+    const logsCopy = [...logs];
+    if (order === "asc") {
+      logsCopy.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    } else {
+      logsCopy.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    }
+    setSortedLogs(logsCopy);
+  };
+
+  const handleOrderChange = (value) => {
+    setOrder(value);
+  };
+
   const columns = [
     {
       title: "Fecha",
@@ -33,15 +54,14 @@ const HomeScreen = () => {
       key: "time",
     },
     {
-      title: "User Card ID",
+      title: "ID del Usuario",
       dataIndex: "id",
       key: "id",
     },
     // Puedes agregar más columnas si necesitas
   ];
 
-  // Prepara los datos para la tabla
-  const data = logs.map((log, index) => {
+  const formattedLogs = sortedLogs.map((log, index) => {
     return {
       key: index,
       id: log.user,
@@ -50,10 +70,19 @@ const HomeScreen = () => {
     };
   });
 
+
   return (
     <div className="p-8">
-      <h1 className="pt-14 text-xl mb-4 text-teal-600">Últimos logs:</h1>
-      <Table columns={columns} dataSource={data} />
+      <div className="flex pt-14 justify-between ">
+        <h1 className="text-xl mb-4 text-teal-600">Últimos logs:</h1>
+        <div>
+          <Select defaultValue={order} onChange={handleOrderChange}>
+            <Option value="asc">Ascendente</Option>
+            <Option value="desc">Descendente</Option>
+          </Select>
+        </div>
+      </div>
+      <Table columns={columns} dataSource={formattedLogs} />
     </div>
   );
 };

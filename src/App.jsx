@@ -11,6 +11,10 @@ const App = () => {
       theme={{
         token: {
           colorPrimary: "#14b8a6",
+          Button: {
+            colorPrimary: '#14b8a6',
+            algorithm: true,
+          },
         },
       }}
     >

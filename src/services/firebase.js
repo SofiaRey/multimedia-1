@@ -20,12 +20,13 @@ export { database };
 
 export const fetchLogs = async () => {
   try {
-    const logsRef = ref(database, "logs"); // Nota el uso de 'ref' aquí
+    const logsRef = ref(database, "logs");
     const snapshot = await get(logsRef);
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      // Manejo de situaciones donde no hay datos
+      console.log("No se encontraron usuarios.");
+      return {};
     }
   } catch (error) {
     console.error("Error al obtener los logs:", error);
@@ -35,7 +36,7 @@ export const fetchLogs = async () => {
 export const fetchUsers = async () => {
   try {
     const db = getDatabase();
-    const usersRef = ref(db, "users"); // Asegúrate de que 'users' es la ruta correcta en tu base de datos
+    const usersRef = ref(db, "users"); 
     const snapshot = await get(usersRef);
     if (snapshot.exists()) {
       return snapshot.val();
@@ -73,5 +74,16 @@ export const deleteUser = async (userId) => {
     console.log("Usuario eliminado con éxito.");
   } catch (error) {
     console.error("Error al eliminar el usuario:", error);
+  }
+};
+
+export const updateUserName = async (userId, newName) => {
+  const db = getDatabase();
+  const userRef = ref(db, `users/${userId}`);
+  try {
+    await update(userRef, { name: newName });
+    console.log("Nombre de usuario actualizado con éxito.");
+  } catch (error) {
+    console.error("Error al actualizar el nombre del usuario:", error);
   }
 };
